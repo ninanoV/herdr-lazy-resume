@@ -1,0 +1,34 @@
+id = "local.lazy-resume"
+name = "Lazy Resume"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "After a server restart, resume each pane's Claude Code session on first focus, one at a time."
+platforms = ["macos", "linux"]
+
+# Handles the pane that is already focused when the restored server comes up
+# (no pane.focused event fires at boot).
+[[startup]]
+command = ["python3", "lazy_resume.py", "startup"]
+
+[[events]]
+on = "pane.focused"
+command = ["python3", "lazy_resume.py", "event"]
+
+# Recording: every event re-reads `pane list` (claude start, session id, moves).
+# Records are removed on a claude release (exit) or pane.closed. A /clear fires no
+# event of its own; its new id is picked up at the next event of any kind.
+[[events]]
+on = "pane.agent_detected"
+command = ["python3", "lazy_resume.py", "event"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "lazy_resume.py", "event"]
+
+[[events]]
+on = "pane.closed"
+command = ["python3", "lazy_resume.py", "event"]
+
+[[events]]
+on = "pane.moved"
+command = ["python3", "lazy_resume.py", "event"]
